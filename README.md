@@ -16,13 +16,13 @@ This package is designed for simple Redis setups without Sentinel or Redis Clust
 ## Installation
 
 ```bash
-npm install redislock
+npm install @yasarrkhan/redislock
 ```
 
 ## Usage
 
 ```js
-const { RedisMutex } = require('redislock');
+const { RedisMutex } = require('@yasarrkhan/redislock');
 const { createClient } = require('redis');
 
 (async () => {

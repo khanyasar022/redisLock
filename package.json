@@ -1,5 +1,5 @@
 {
-  "name": "redislock",
+  "name": "@yasarrkhan/redislock",
   "version": "0.1.0",
   "description": "A simple Redis-based mutex lock package for single-node Redis deployments without Sentinel or Redis Cluster",
   "main": "./lib/index.js",
@@ -21,9 +21,12 @@
     "distributed-lock"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourname/redisLock.git"
+    "url": "git+https://github.com/khanyasar022/redisLock.git"
   },
   "dependencies": {
     "redis": "^4.6.14"
