@@ -96,3 +96,25 @@ test('acquire stops trying after the configured timeout', async () => {
 
   assert.equal(token, null);
 });
+
+test('auto extend stops after the configured maximum duration', async () => {
+  const store = new Map();
+  const client = {
+    async set(key, value, options) {
+      store.set(key, { value, ttlMs: options.PX });
+      return 'OK';
+    },
+    async eval() {
+      return 1;
+    }
+  };
+
+  const mutex = new RedisMutex(client, { ttlMs: 1000, retryDelayMs: 1, maxAttempts: 1 });
+  const token = await mutex.acquire('job:4');
+  const stopAutoExtend = mutex.startAutoExtend('job:4', token, { intervalMs: 1, ttlMs: 1000, maxDurationMs: 20 });
+
+  await new Promise(resolve => setTimeout(resolve, 30));
+  stopAutoExtend();
+
+  assert.ok(store.has('job:4'));
+});
