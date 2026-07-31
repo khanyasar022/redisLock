@@ -118,3 +118,31 @@ test('auto extend stops after the configured maximum duration', async () => {
 
   assert.ok(store.has('job:4'));
 });
+
+test('heartbeat callback is invoked during auto extend', async () => {
+  let heartbeats = 0;
+  const client = {
+    async set() {
+      return 'OK';
+    },
+    async eval() {
+      return 1;
+    }
+  };
+
+  const mutex = new RedisMutex(client, { ttlMs: 1000, retryDelayMs: 1, maxAttempts: 1 });
+  const token = await mutex.acquire('job:5');
+  const stopAutoExtend = mutex.startAutoExtend('job:5', token, {
+    intervalMs: 1,
+    ttlMs: 1000,
+    maxDurationMs: 20,
+    heartbeat: () => {
+      heartbeats += 1;
+    }
+  });
+
+  await new Promise(resolve => setTimeout(resolve, 15));
+  stopAutoExtend();
+
+  assert.ok(heartbeats >= 1);
+});

@@ -54,3 +54,7 @@ const { createClient } = require('redis');
 - This package targets single-node Redis deployments.
 - For production-grade failover scenarios, consider Redis Sentinel or Redis Cluster.
 - The lock is best-effort and relies on the Redis client supplied by the caller.
+- This lock is not a correctness boundary. It can reduce concurrent access, but it does not guarantee that two processes will never act on stale state at the same time.
+- Even when you use the API correctly, the lock can still fail under GC pauses or other long stop-the-world delays. A process may lose its lease, another process may acquire the lock, and a later `renew` or `extend` call can fail.
+- The risky case is when you update application state before discovering that the lock has expired. In that situation, the state change may already be visible even though the lock is no longer valid.
+- If you need correctness, use fencing tokens with Redis locks and have downstream writes reject stale tokens.
